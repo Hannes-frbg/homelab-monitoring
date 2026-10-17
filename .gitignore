@@ -1,0 +1,11 @@
+# Runtime data
+prometheus_data/
+grafana_data/
+
+# Secrets
+.env
+pve_exporter/pve.yml
+!pve_exporter/pve.yml.example
+
+# Logs
+*.log

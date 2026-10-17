@@ -1,0 +1,38 @@
+groups:
+  - name: homelab-infrastructure-alerts
+    rules:
+      - alert: HostDown
+        expr: up == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Host {{ $labels.instance }} ist nicht erreichbar"
+          description: "Target {{ $labels.instance }} antwortet seit mehr als 2 Minuten nicht auf Scrapes."
+
+      - alert: HighCpuUsage
+        expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Hohe CPU-Auslastung auf {{ $labels.instance }}"
+          description: "Die CPU-Last liegt seit über 5 Minuten bei > 90%."
+
+      - alert: DiskSpaceFillingUp
+        expr: (node_filesystem_avail_bytes * 100) / node_filesystem_size_bytes < 10
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Festplattenspeicher wird knapp auf {{ $labels.instance }}"
+          description: "Mountpoint {{ $labels.mountpoint }} hat weniger als 10% freien Speicherplatz."
+
+      - alert: ZfsPoolDegraded
+        expr: pve_storage_used_ratio > 0.90
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Proxmox Speicher fast voll ({{ $labels.storage }})"
+          description: "Speicher {{ $labels.storage }} ist zu über 90% belegt."
